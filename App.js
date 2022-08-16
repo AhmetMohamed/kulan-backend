@@ -2,7 +2,6 @@ const express = require("express");
 const dotenv = require("dotenv");
 const userRoute = require("./Routes/userRoute");
 const postRoute = require("./Routes/postRoute");
-const commentRoute = require("./Routes/commentRoute");
 const app = express();
 
 app.use(express.json());
@@ -12,7 +11,6 @@ require("./Server");
 
 app.use("/user", userRoute);
 app.use("/post", postRoute);
-app.use("/comment", commentRoute);
 
 const port = 8000;
 app.listen(port, () => {

@@ -13,4 +13,6 @@ router
   .put(postControllers.editPost)
   .delete(postControllers.deletePost);
 
+router.put("/:id/comments", postControllers.commentPost);
+
 module.exports = router;

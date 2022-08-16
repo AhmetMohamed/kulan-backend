@@ -1,5 +1,4 @@
 const posts = require("../Models/postModel");
-const comments = require("../Models/commentModel");
 
 exports.createPost = async (req, res) => {
   try {
@@ -28,8 +27,6 @@ exports.getAllPost = async (req, res) => {
 
 exports.getPost = async (req, res) => {
   try {
-    const findcomment = await comments.find(req.body.text);
-    console.log(findcomment);
     //find all Question from the database
     const post = await posts.findById(req.params.id);
     res.status(200).json({ message: "Question found successfully", post });
@@ -56,4 +53,17 @@ exports.deletePost = async (req, res) => {
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
+};
+
+//Comment Post
+exports.commentPost = async (req, res) => {
+  const id = req.params.id;
+  const { userId } = req.body;
+  try {
+    const post = await posts.findById(id);
+    if (!post.comments.includes(userId)) {
+      await post.updateOne({ $push: { comments: req.body.text }, userId });
+      res.status(200).json({ message: "comment is commited successfully" });
+    }
+  } catch (error) {}
 };

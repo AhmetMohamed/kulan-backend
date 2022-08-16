@@ -14,7 +14,6 @@ const postSchema = mongoose.Schema({
   comments: [
     {
       type: String,
-      default: null,
       ref: "Comment",
     },
   ],
