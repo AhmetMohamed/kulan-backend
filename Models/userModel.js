@@ -20,14 +20,36 @@ const userSchema = mongoose.Schema({
     type: String,
     // required: true,
   },
-  language: {
+  location: {
     type: String,
-    // required: true,
-    enum: [],
+    required: true,
   },
+  language: [
+    {
+      type: String,
+      // required: true,
+      // enum: [],
+    },
+  ],
   description: {
     type: String,
-    // required: true,
+    required: true,
+  },
+  github: {
+    type: String,
+    required: true,
+  },
+  linkedin: {
+    type: String,
+    required: true,
+  },
+  dribble: {
+    type: String,
+    required: true,
+  },
+  portfolio: {
+    type: String,
+    required: true,
   },
 });
 

@@ -58,3 +58,13 @@ exports.deleteUser = async (req, res) => {
     .status(200)
     .json({ message: "user is Not valid Enter enter valid Email" });
 };
+
+//Add Language to langagage array
+exports.Addlanguges = async (req, res) => {
+  const user = await users.findById(req.params.id);
+  if (!user) {
+    res.status(400).json({ message: "user is not valid" });
+  }
+  await user.updateOne({ $push: { language: req.body.language } });
+  return res.status(200).json({ message: "language is added successfully" });
+};
