@@ -1,9 +1,10 @@
 const users = require("../Models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 exports.signUp = async (req, res) => {
   try {
-    console.log(req.user);
+    // console.log(req.user);
     const user = await users.findOne({ email: req.body.email });
 
     //email is already existing
@@ -13,21 +14,33 @@ exports.signUp = async (req, res) => {
     // password !== confirm password
     if (req.body.password !== req.body.confirmPassword) {
       return res
-        .status(403)
+        .status(400)
         .json({ message: "Password must match confirm password" });
     }
     //password greater than 7
     if (req.body.password.length < 7) {
       return res
-        .status(403)
+        .status(400)
         .json({ message: "Password must be at least 7 characters" });
     }
     //encrypted Password
     const encrypted = await bcrypt.hash(req.body.password, 10);
     req.body.password = encrypted;
 
+    const token = jwt.sign(
+      {
+        data: { email: req.body.email },
+        expiresAt: "1h",
+      },
+      process.env.JwtSecret
+    );
+
+    // console.log(token);
+
+    req.body.image = req.file.filename;
     await users.create(req.body);
-    res.status(200).json({ message: "user created successfully" });
+    // console.log(req.body);
+    res.status(200).json({ message: "user created successfully", token });
   } catch (e) {
     res.status(400).json({ message: e.message });
   }
@@ -40,12 +53,27 @@ exports.logIn = async (req, res) => {
     res.status(400).json({ message: "Email is not exists" });
   }
   //2. password correct
-  const decrypted = bcrypt.compare(req.body.password, users.password);
+  const decrypted = bcrypt.compare(req.body.password, user.password);
   if (decrypted === false) {
     res.status(400).json({ message: "Password incorrect" });
   }
+
+  //WebToken
+  const token = jwt.sign(
+    {
+      data: {
+        name: user.name,
+        image: user.image,
+        location: user.location,
+        skills: user.skills,
+      },
+      expiresAt: "1h",
+    },
+    process.env.JwtSecret
+  );
+
   //3. login success
-  res.status(200).json({ message: "successfully Login" });
+  res.status(200).json({ message: "successfully Login", token });
 };
 
 exports.deleteUser = async (req, res) => {
@@ -59,12 +87,30 @@ exports.deleteUser = async (req, res) => {
     .json({ message: "user is Not valid Enter enter valid Email" });
 };
 
-//Add Language to langagage array
-exports.Addlanguges = async (req, res) => {
-  const user = await users.findById(req.params.id);
-  if (!user) {
-    res.status(400).json({ message: "user is not valid" });
+exports.protect = async (req, res, next) => {
+  try {
+    // console.log(req.headers.authorization);
+    const token = req.headers.authorization;
+    if (!token) {
+      return res.status(400).json({ message: "Please Login" });
+    }
+    jwt.verify(token, process.env.JwtSecret, function (err, decoded) {
+      if (err) {
+        return res.status(400).json({ message: "Token Expired" });
+      }
+      console.log(decoded.data);
+    });
+    next();
+  } catch (e) {
+    console.log(e);
   }
-  await user.updateOne({ $push: { language: req.body.language } });
-  return res.status(200).json({ message: "language is added successfully" });
+};
+
+exports.getOneUser = async (req, res) => {
+  try {
+    const getuser = await users.find({});
+    res.status(200).json({ message: "single user", data: getuser });
+  } catch (e) {
+    console.log(e);
+  }
 };
