@@ -3,22 +3,31 @@ const mongoose = require("mongoose");
 const postSchema = mongoose.Schema({
   title: {
     type: String,
-    required: true,
+    unique: true,
+    required: "Please enter question title",
     trim: true,
   },
-  body: {
+  question: {
     type: String,
-    required: true,
+    required: "Please enter your question description here",
     trim: true,
   },
+  // comments: [
+  //   {
+  //     type: String,
+  //   },
+  // ],
   comments: [
     {
-      type: String,
-      ref: "Comment",
+      comment: String,
+      user: {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+      },
     },
   ],
 
-  user: {
+  postUser: {
     type: mongoose.Types.ObjectId,
     ref: "User",
   },
