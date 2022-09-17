@@ -1,6 +1,5 @@
 const posts = require("../Models/postModel");
 const jwt = require("jsonwebtoken");
-const { logIn } = require("./userController");
 
 exports.createPost = async (req, res) => {
   try {
@@ -67,8 +66,8 @@ exports.deletePost = async (req, res) => {
 //Comment Post
 exports.comments = async (req, res) => {
   try {
-    console.log(req.params.id);
-    console.log(req.body);
+    // console.log(req.params.id);
+    // console.log(req.body);
     await posts.findByIdAndUpdate(req.params.id, {
       $push: { comments: { comment: req.body.comment, user: req.user.id } },
     });

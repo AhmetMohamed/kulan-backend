@@ -30,7 +30,7 @@ exports.signUp = async (req, res) => {
 
     const token = jwt.sign(
       {
-        data: { email: req.body.email },
+        data: { email: req.body.email, image: req.body.image },
         expiresAt: "1h",
       },
       process.env.JwtSecret
@@ -110,7 +110,7 @@ exports.protect = async (req, res, next) => {
     });
     next();
   } catch (e) {
-    console.log(e);
+    console.log(e.message);
   }
 };
 
